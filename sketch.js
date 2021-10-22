@@ -1,175 +1,45 @@
-var PLAY = 1;
-var END = 0;
-var gameState = PLAY;
-
-var trex, trex_running, trex_collided;
-var ground, invisibleGround, groundImage;
-
-var cloudsGroup, cloudImage;
-var obstaclesGroup, obstacle1, obstacle2, obstacle3, obstacle4, obstacle5, obstacle6;
-
-var score;
-var gameOverImg,restartImg
-
+var sea,ship;
+var seaImg,shipImg;
 
 function preload(){
-  trex_running = loadAnimation("trex1.png","trex3.png","trex4.png");
-  trex_collided=loadAnimation("trex_collided.png");
-  groundImage = loadImage("ground2.png");
-  
-  cloudImage = loadImage("cloud.png");
-  
-  obstacle1 = loadImage("obstacle1.png");
-  obstacle2 = loadImage("obstacle2.png");
-  obstacle3 = loadImage("obstacle3.png");
-  obstacle4 = loadImage("obstacle4.png");
-  obstacle5 = loadImage("obstacle5.png");
-  obstacle6 = loadImage("obstacle6.png");
-  
-   restartImg = loadImage("restart.png")
-  gameOverImg = loadImage("gameOver.png")
-  
+  seaImg = loadImage("sea.png");
+  //shipImg1=loadAnimation("sea.png")
+//Choose the correct option by uncommenting the right line to load the animation for ship.
+  shipImg = loadAnimation("ship-1.png","ship-1.png","ship-2.png","ship-1.png");
+  //shipImg1 = loadAnimation("ship-1","ship-1","ship-2","ship-1");
+  //shipImg1 = loadAnimation("1.png","2.png","3.png","4.png");
+
 }
 
-function setup() {
-  createCanvas(600, 200);
-  
-  trex = createSprite(50,180,20,50);
-  trex.addAnimation("running", trex_running);
-  trex.scale = 0.5;
-  trex.addAnimation("collided",trex_collided);
-  ground = createSprite(200,180,400,20);
-  ground.addImage("ground",groundImage);
-  ground.x = ground.width /2;
-  
-    gameOver = createSprite(300,100);
-  gameOver.addImage(gameOverImg);
-  
-  restart = createSprite(300,140);
-  restart.addImage(restartImg);
-  
-  gameOver.scale = 0.5;
-  restart.scale = 0.5;
-  invisibleGround = createSprite(200,190,400,10);
-  invisibleGround.visible = false;
-  
+function setup(){
+  createCanvas(400,400);
+  background("blue");
 
-  obstaclesGroup = createGroup();
-  cloudsGroup = createGroup();
+  // Moving background
+  sea=createSprite(400,200);
+  sea.addImage(seaImg);
+  sea.scale=0.3;
+
   
-  console.log("Hello" + 5);
+  ship = createSprite(130,200,30,30);
+  ship.addAnimation("movingShip",shipImg);
+  ship.scale =0.25;
   
-  trex.setCollider("circle",0,0,50);
-  trex.debug = true
-  
-  score = 0;
 }
 
 function draw() {
-  background(180);
-  text("Score: "+ score, 500,50);
+  background(0);
   
-    console.log("this is ",gameState)
-
-  
-  if(gameState === PLAY){
-     gameOver.visible = false
-    restart.visible = false
-    ground.velocityX = -4;
-    score = score + Math.round(frameCount/60);
-    
-    if (ground.x < 0){
-      ground.x = ground.width/2;
-    }
-  
-    if(keyDown("space")&& trex.y >= 100) {
-        trex.velocityY = -13;
-    }
-    
-    trex.velocityY = trex.velocityY + 0.8
-  
-    spawnClouds();
-
-
-    spawnObstacles();
-    
-    if(obstaclesGroup.isTouching(trex)){
-        gameState = END;
-    }
+//Uncomment the correct line to make the background move to create a forward moving effect for the boat.
+  //sea.velocityY = -3;
+  //sea.x = -3;
+  sea.velocityX = -3;
+  //sea.velocityX = 3;
+  if(sea.x<0){
+  sea.x=sea.width/8
   }
-   else if (gameState === END) {
-      ground.velocityX = 0;
-      trex.velocityY=0;
-      gameOver.visible = true;
-    restart.visible = true;
-     obstaclesGroup.setVelocityXEach(0);
-     cloudsGroup.setVelocityXEach(0);
 
-     obstaclesGroup.setLifetimeEach(-1);
-     cloudsGroup.setLifetimeEach(-1);
-
-     trex.changeAnimation("collided",trex_collided)
-
-   }
   
- 
-
-  trex.collide(invisibleGround);
-  
-  
-  
+    
   drawSprites();
 }
-
-function spawnObstacles(){
- if (frameCount % 60 === 0){
-   var obstacle = createSprite(400,165,10,40);
-   obstacle.velocityX = -6;
-   
-
-    var rand = Math.round(random(1,6));
-    switch(rand) {
-      case 1: obstacle.addImage(obstacle1);
-              break;
-      case 2: obstacle.addImage(obstacle2);
-              break;
-      case 3: obstacle.addImage(obstacle3);
-              break;
-      case 4: obstacle.addImage(obstacle4);
-              break;
-      case 5: obstacle.addImage(obstacle5);
-              break;
-      case 6: obstacle.addImage(obstacle6);
-              break;
-      default: break;
-    }
-   
-  
-    obstacle.scale = 0.5;
-    obstacle.lifetime = 300;
-   
-  
-    obstaclesGroup.add(obstacle);
- }
-}
-
-function spawnClouds() {
-
-   if (frameCount % 60 === 0) {
-     cloud = createSprite(600,100,40,10);
-    cloud.y = Math.round(random(10,60));
-    cloud.addImage(cloudImage);
-    cloud.scale = 0.5;
-    cloud.velocityX = -3;
-    
-  
-    cloud.lifetime = 134;
-    
-    cloud.depth =trex.depth
-    trex.depth = trex.depth + 1;
-    
-  
-   cloudsGroup.add(cloud);
-    }
-}
-
